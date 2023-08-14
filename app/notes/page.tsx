@@ -1,12 +1,18 @@
 import Link from "next/link";
+import PocketBase from "pocketbase";
+import CreateNote from "./[id]/CreateNote";
+const pb = new PocketBase("http://127.0.0.1:8090");
+
+export const revalidate = 10;
 
 async function getNotes() {
-  const res = await fetch(
-    "http://127.0.0.1:8090/api/collections/posts/records",
-    { cache: "no-store" }
-  );
-  const data = await res.json();
-  return data?.items as any[];
+  const data = await pb.collection("posts").getFullList();
+  // const res = await fetch(
+  //   "http://127.0.0.1:8090/api/collections/posts/records",
+  //   { cache: "no-store" }
+  // );
+  // const data = await res.json();
+  return data;
 }
 
 export default async function NotesPage() {
@@ -19,6 +25,7 @@ export default async function NotesPage() {
           return <Note key={note.id} note={note} />;
         })}
       </div>
+      <CreateNote />
     </div>
   );
 }
